@@ -1145,7 +1145,7 @@ function getMonsterStat(floor,dungeonId){
   const atk = Math.round(BASE_ATK[dungeonId] * fs);
   const cr  = Math.min(0.45, CR_BASE[dungeonId] + floor*0.001);
   const cm  = CM_BASE[dungeonId];
-  const coin= Math.round(10 + dungeonId*30 + floor*3);
+  const coin= Math.round(15 + dungeonId*40 + floor*5);
   return {hp,atk,cr,cm,coin};
 }
 
@@ -1202,7 +1202,7 @@ function getCurrentMonster(){
       atk :bossAtk,
       cr  :Math.min(0.50,stat.cr+0.05),
       cm  :Math.min(2.8, stat.cm+0.1),
-      coin:Math.round(stat.coin*(2+bFloor/20))};
+      coin:Math.round(stat.coin*(3+bFloor/15))};
   }
 
   // 일반 몬스터 — monByFloor 층별 고정
@@ -1494,6 +1494,13 @@ const ITEMS=[
 {id:'con_3',em:'🥤', nm:'전투 음료',        cat:'consumable',rarity:'희귀', price:80, special:false, effect:{atk_buff:5},     desc:'1전투 동안 공격력 +5',  slot:null},
 {id:'con_4',em:'⚡', nm:'스피드 젤',        cat:'consumable',rarity:'희귀', price:90, special:false, effect:{agi_buff:8},     desc:'1전투 동안 민첩 +8',    slot:null},
 {id:'con_5',em:'🧪', nm:'크리티컬 엘릭서', cat:'consumable',rarity:'영웅', price:200,special:false, effect:{cr_buff:10},     desc:'1전투 동안 크리율 +10%',slot:null}
+,
+  {id:'a_l1',em:'🛡️',nm:'수학신의 갑옷',cat:'armor',rarity:'전설',price:800,special:false,effect:{def:18,hp_pct:10,all:3},desc:'수학신이 입던 전설의 갑옷',slot:'armor'},
+  {id:'a_l2',em:'🔱',nm:'공식의 흉갑',cat:'armor',rarity:'전설',price:850,special:false,effect:{def:15,atk:8,cr:3},desc:'수학의 공식이 새겨진 흉갑',slot:'armor'},
+  {id:'a_m1',em:'✨',nm:'무한의 법의',cat:'armor',rarity:'신화',price:1200,special:false,effect:{def:20,hp_pct:15,all:5,xp_bonus:0.05},desc:'무한의 힘이 깃든 신화급 법의',slot:'armor'},
+  {id:'acc_l1',em:'💎',nm:'확률의 다이아 반지',cat:'accessory',rarity:'전설',price:800,special:false,effect:{cr:8,cm:0.4,coin_bonus:0.15},desc:'확률의 힘이 담긴 다이아 반지',slot:'accessory'},
+  {id:'acc_l2',em:'🌙',nm:'적분의 달 목걸이',cat:'accessory',rarity:'전설',price:850,special:false,effect:{mp:25,atk:10,spd:5},desc:'달의 기운이 담긴 전설 목걸이',slot:'accessory'},
+  {id:'acc_m1',em:'🌟',nm:'수학왕의 왕관',cat:'accessory',rarity:'신화',price:1500,special:false,effect:{all:8,cr:10,cm:0.5,xp_bonus:0.1},desc:'수학왕만이 쓸 수 있는 신화급 왕관',slot:'accessory'}
 ];
 const RARITY_STYLE={
   일반:{bg:'#F1EFE8',c:'#444441',border:'#ccc'},
@@ -3983,6 +3990,8 @@ function bLoop(){
             let coin=bMode==='pvp'&&bPvpTarget?15:tier.coin;
             const mult=bWinStreak>=5?2:bWinStreak>=3?1.5:bWinStreak>=2?1.2:1;
             if(mult>1) coin=Math.round(coin*mult);
+            const _ef=getEquipEffect();
+            if(_ef.coin_bonus) coin=Math.round(coin*(1+(_ef.coin_bonus||0)));
             C.coins+=coin;
             const msg=(bMode==='pvp'&&bPvpTarget?bPvpTarget.name+' 격파':tier.name+' 격파')+'! +'+coin+'💰'+(bWinStreak>=2?' 🔥'+bWinStreak+'연승':'');
             toast('🏆 '+msg);
